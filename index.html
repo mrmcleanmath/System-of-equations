@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Solve Systems of Linear Equations – Mr. McLean Math</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg-alt: #111729;
+      --panel: #1a2338;
+      --panel-alt: #121826;
+      --accent: #4fc3f7;
+      --accent-soft: #28374f;
+      --text: #e6ecff;
+      --muted: #9fa8da;
+      --border: #2b3550;
+      --error: #ff5252;
+      --success: #81c784;
+      --danger-soft: #3b1f24;
+      --success-soft: #193424;
+    }
+
+    body.high-contrast-off {
+      --bg: #f5f5f5;
+      --bg-alt: #ffffff;
+      --panel: #ffffff;
+      --panel-alt: #f0f2f8;
+      --accent: #1976d2;
+      --accent-soft: #e3f2fd;
+      --text: #222222;
+      --muted: #555555;
+      --border: #cccccc;
+      --error: #c62828;
+      --success: #2e7d32;
+      --danger-soft: #ffebee;
+      --success-soft: #e8f5e9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1b2945 0, #060812 55%, #01020a 100%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .chip.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    .chip span.emoji {
+      font-size: 1.1rem;
+    }
+
+    .panel {
+      background: linear-gradient(145deg, var(--panel), var(--panel-alt));
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 22px 45px rgba(0, 0, 0, 0.55);
+    }
+
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .panel-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle input {
+      accent-color: var(--accent);
+    }
+
+    .select {
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.2);
+      color: var(--text);
+      font-size: 0.85rem;
+      min-width: 80px;
+    }
+
+    .tabs {
+      display: inline-flex;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .tab {
+      padding: 6px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      user-select: none;
+    }
+
+    .tab.active {
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.2fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .instructions {
+      font-size: 0.92rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      min-height: 2.5em;
+    }
+
+    .equations {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 0.98rem;
+      margin-bottom: 10px;
+    }
+
+    .equation-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 2px 0;
+    }
+
+    .equation-label {
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .equation-text {
+      flex: 1;
+    }
+
+    .equation-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .equation-badge.active {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    .graph-container {
+      background: #050713;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      border-radius: 8px;
+      background: #020309;
+      border: 1px solid #22263a;
+      max-width: 100%;
+      height: auto;
+      image-rendering: crisp-edges;
+    }
+
+    .inputs {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      margin-top: 8px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.85rem;
+    }
+
+    .field label {
+      color: var(--muted);
+    }
+
+    .field input {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+
+    .field input:focus {
+      outline: 1px solid var(--accent);
+      border-color: var(--accent);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 7px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: #020308;
+    }
+
+    button.secondary {
+      background: rgba(0, 0, 0, 0.15);
+      border-color: var(--border);
+      color: var(--muted);
+    }
+
+    button.danger {
+      background: var(--danger-soft);
+      border-color: var(--error);
+      color: var(--error);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .feedback-panel {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      font-size: 0.9rem;
+      min-height: 3.2em;
+    }
+
+    .feedback-main {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .feedback-main.ok {
+      color: var(--success);
+    }
+
+    .feedback-main.bad {
+      color: var(--error);
+    }
+
+    .feedback-detail {
+      color: var(--muted);
+      font-size: 0.85rem;
+      white-space: pre-line;
+    }
+
+    .score-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .score-pill {
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+    }
+
+    .summary {
+      margin-top: 8px;
+      font-size: 0.85rem;
+    }
+
+    .summary h3 {
+      margin: 4px 0 6px;
+      font-size: 0.95rem;
+    }
+
+    .summary ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .summary li {
+      margin-bottom: 3px;
+    }
+
+    .summary-toggle {
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--accent);
+      text-decoration: underline;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .worksheet-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .worksheet-list {
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    .worksheet-item {
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.25);
+      padding: 6px 8px;
+      margin-bottom: 4px;
+    }
+
+    .worksheet-answer {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    .worksheet-answer.visible {
+      display: block;
+    }
+
+    footer {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .small-tag {
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .dev-panel {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      padding: 8px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px dashed var(--border);
+      display: none;
+    }
+
+    .dev-panel.visible {
+      display: block;
+    }
+
+    .dev-panel ul {
+      margin: 4px 0 0;
+      padding-left: 16px;
+    }
+
+    .dev-panel li.ok {
+      color: var(--success);
+    }
+
+    .dev-panel li.fail {
+      color: var(--error);
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Solve Systems of Linear Equations</h1>
+    <p class="subtitle">
+      Practice solving systems of linear equations graphically (by drawing lines on a grid) and algebraically (by calculation).
+    </p>
+  </header>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="chip-row" aria-label="Difficulty selection">
+        <button class="chip active" data-difficulty="easy" type="button">
+          <span class="emoji">🟢</span><span>Easy</span>
+        </button>
+        <button class="chip" data-difficulty="medium" type="button">
+          <span class="emoji">🟡</span><span>Medium</span>
+        </button>
+        <button class="chip" data-difficulty="hard" type="button">
+          <span class="emoji">🔴</span><span>Hard</span>
+        </button>
+        <button class="chip" data-difficulty="random" type="button">
+          <span class="emoji">🎲</span><span>Random</span>
+        </button>
+      </div>
+      <div class="toggle-row">
+        <div class="tabs" aria-label="Mode">
+          <button class="tab active" data-mainmode="game" type="button">Game mode</button>
+          <button class="tab" data-mainmode="worksheet" type="button">Worksheet mode</button>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="toggleHighContrast" checked>
+          High contrast
+        </label>
+      </div>
+    </div>
+
+    <div class="toggle-row" style="margin-bottom: 4px;">
+      <div class="chip-row">
+        <span class="small-tag">Problem type:</span>
+        <button class="chip active" data-problemtype="mixed" type="button">Mixed</button>
+        <button class="chip" data-problemtype="graph" type="button">Graph only</button>
+        <button class="chip" data-problemtype="algebra" type="button">Algebra only</button>
+      </div>
+
+      <div class="toggle-row">
+        <label class="toggle">
+          <input type="checkbox" id="toggleSound" checked>
+          Sound
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="toggleTimer">
+          Timer
+        </label>
+        <select id="timerSelect" class="select" aria-label="Timer length" disabled>
+          <option value="30">30 s</option>
+          <option value="60" selected>60 s</option>
+          <option value="90">90 s</option>
+          <option value="120">120 s</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div id="gameView" class="layout">
+    <div class="panel" aria-labelledby="problemTitle">
+      <div class="panel-header">
+        <div class="panel-title" id="problemTitle">Game problem</div>
+        <div class="pill-group">
+          <span class="small-tag" id="modeTag">Mode: Graph</span>
+          <span class="small-tag" id="difficultyTag">Difficulty: Easy</span>
+          <span class="small-tag" id="timerTag" style="display:none;">Time left: <span id="timerValue">60</span>s</span>
+        </div>
+      </div>
+
+      <div class="instructions" id="instructions" aria-live="polite">
+        Click two points to draw each line, then click the intersection point and press Submit.
+      </div>
+
+      <div class="equations" id="equationsBox">
+        <div class="equation-line">
+          <span class="equation-label">Line 1:</span>
+          <span class="equation-text" id="eq1Text">y = x + 3</span>
+          <span class="equation-badge" id="eq1Badge">Drawing</span>
+        </div>
+        <div class="equation-line">
+          <span class="equation-label">Line 2:</span>
+          <span class="equation-text" id="eq2Text">y = 2x + 1</span>
+          <span class="equation-badge" id="eq2Badge">Waiting</span>
+        </div>
+      </div>
+
+      <div class="graph-container" id="graphContainer">
+        <canvas id="graphCanvas" width="420" height="420" aria-label="Graph grid for systems of equations"></canvas>
+      </div>
+
+      <div class="inputs" id="algebraInputs" style="display:none;">
+        <div class="field">
+          <label for="inputX">Solution x</label>
+          <input id="inputX" type="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="inputY">Solution y</label>
+          <input id="inputY" type="text" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="submitBtn" class="primary" type="button">
+          Submit (Enter)
+        </button>
+        <button id="nextBtn" class="secondary" type="button">
+          Next problem
+        </button>
+        <button id="clearBtn" class="secondary" type="button">
+          Clear (Esc)
+        </button>
+        <button id="showStepsBtn" class="secondary" type="button" disabled>
+          Show steps
+        </button>
+      </div>
+    </div>
+
+    <div class="panel" aria-label="Feedback and summary">
+      <div class="panel-header">
+        <div class="panel-title">Feedback & score</div>
+      </div>
+      <div class="feedback-panel">
+        <div id="feedbackMain" class="feedback-main" aria-live="polite"></div>
+        <div id="feedbackDetail" class="feedback-detail"></div>
+      </div>
+
+      <div class="score-row">
+        <div class="score-pill">Score: <span id="scoreValue">0</span></div>
+        <div class="score-pill">Streak: <span id="streakValue">0</span></div>
+        <div class="score-pill">Correct: <span id="correctValue">0</span> / <span id="totalValue">0</span></div>
+        <div class="score-pill">Accuracy: <span id="accuracyValue">0%</span></div>
+      </div>
+
+      <div class="summary">
+        <button id="toggleSummaryBtn" type="button" class="summary-toggle">
+          Show incorrect problems
+        </button>
+        <div id="summaryContent" style="display:none;">
+          <h3>Incorrect problems this session</h3>
+          <ul id="incorrectList"></ul>
+        </div>
+      </div>
+
+      <div id="devPanel" class="dev-panel">
+        <strong>Developer tests</strong>
+        <ul id="devList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="worksheetView" class="panel" style="display:none;">
+    <div class="panel-header">
+      <div class="panel-title">Worksheet mode</div>
+      <span class="small-tag">Print or project for written practice</span>
+    </div>
+
+    <div class="worksheet-controls">
+      <span class="small-tag">Number of questions:</span>
+      <button class="chip" data-wq="5" type="button">5</button>
+      <button class="chip active" data-wq="10" type="button">10</button>
+      <button class="chip" data-wq="15" type="button">15</button>
+
+      <span class="small-tag">Type:</span>
+      <button class="chip active" data-wtype="mixed" type="button">Mixed</button>
+      <button class="chip" data-wtype="graph" type="button">Graph only</button>
+      <button class="chip" data-wtype="algebra" type="button">Algebra only</button>
+
+      <button id="generateWorksheetBtn" class="primary" type="button">
+        Generate worksheet
+      </button>
+
+      <button id="revealAllBtn" class="secondary" type="button">
+        Reveal all
+      </button>
+      <button id="hideAllBtn" class="secondary" type="button">
+        Hide all
+      </button>
+    </div>
+
+    <div class="worksheet-list" id="worksheetList">
+      <p style="color: var(--muted); font-size: 0.9rem;">
+        Choose how many questions you want and click "Generate worksheet" to create a fresh set of problems.
+      </p>
+    </div>
+  </div>
+
+  <footer>
+    Created by Mr. McLean Math.
+  </footer>
+
+  <div class="sr-only" aria-live="polite" id="ariaStatus"></div>
+</div>
+
+<script>
+(function() {
+  function hasDevMode() {
+    return window.location.search.indexOf("dev=1") !== -1;
+  }
+
+  const state = {
+    difficulty: "easy",
+    mainMode: "game",
+    problemType: "mixed",
+    currentProblem: null,
+    gameMode: "graph",
+    score: 0,
+    streak: 0,
+    correct: 0,
+    total: 0,
+    awaitingNext: false,
+    incorrectProblems: [],
+    timerEnabled: false,
+    timerSeconds: 60,
+    timerRemaining: 60,
+    timerId: null,
+    soundOn: true
+  };
+
+  const worksheetState = {
+    count: 10,
+    type: "mixed",
+    problems: []
+  };
+
+  const body = document.body;
+  const difficultyChips = document.querySelectorAll(".chip[data-difficulty]");
+  const problemTypeChips = document.querySelectorAll(".chip[data-problemtype]");
+  const mainModeTabs = document.querySelectorAll(".tab[data-mainmode]");
+  const toggleHighContrast = document.getElementById("toggleHighContrast");
+  const toggleSound = document.getElementById("toggleSound");
+  const toggleTimer = document.getElementById("toggleTimer");
+  const timerSelect = document.getElementById("timerSelect");
+  const timerTag = document.getElementById("timerTag");
+  const timerValue = document.getElementById("timerValue");
+  const modeTag = document.getElementById("modeTag");
+  const difficultyTag = document.getElementById("difficultyTag");
+
+  const gameView = document.getElementById("gameView");
+  const worksheetView = document.getElementById("worksheetView");
+
+  const instructionsEl = document.getElementById("instructions");
+  const eq1Text = document.getElementById("eq1Text");
+  const eq2Text = document.getElementById("eq2Text");
+  const eq1Badge = document.getElementById("eq1Badge");
+  const eq2Badge = document.getElementById("eq2Badge");
+
+  const graphCanvas = document.getElementById("graphCanvas");
+  const graphContainer = document.getElementById("graphContainer");
+  const algebraInputs = document.getElementById("algebraInputs");
+  const inputX = document.getElementById("inputX");
+  const inputY = document.getElementById("inputY");
+
+  const submitBtn = document.getElementById("submitBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const showStepsBtn = document.getElementById("showStepsBtn");
+
+  const feedbackMain = document.getElementById("feedbackMain");
+  const feedbackDetail = document.getElementById("feedbackDetail");
+  const scoreValue = document.getElementById("scoreValue");
+  const streakValue = document.getElementById("streakValue");
+  const correctValue = document.getElementById("correctValue");
+  const totalValue = document.getElementById("totalValue");
+  const accuracyValue = document.getElementById("accuracyValue");
+  const toggleSummaryBtn = document.getElementById("toggleSummaryBtn");
+  const summaryContent = document.getElementById("summaryContent");
+  const incorrectList = document.getElementById("incorrectList");
+  const ariaStatus = document.getElementById("ariaStatus");
+  const devPanel = document.getElementById("devPanel");
+  const devList = document.getElementById("devList");
+
+  const worksheetCountChips = document.querySelectorAll(".chip[data-wq]");
+  const worksheetTypeChips = document.querySelectorAll(".chip[data-wtype]");
+  const generateWorksheetBtn = document.getElementById("generateWorksheetBtn");
+  const revealAllBtn = document.getElementById("revealAllBtn");
+  const hideAllBtn = document.getElementById("hideAllBtn");
+  const worksheetList = document.getElementById("worksheetList");
+
+  let audioCtx = null;
+  function ensureAudioCtx() {
+    if (!audioCtx) {
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      } catch (e) {
+        audioCtx = null;
+      }
+    }
+  }
+
+  function beep(frequency, durationMs) {
+    if (!state.soundOn) return;
+    ensureAudioCtx();
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = frequency;
+    osc.type = "sine";
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const now = audioCtx.currentTime;
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + durationMs / 1000);
+    osc.start(now);
+    osc.stop(now + durationMs / 1000);
+  }
+
+  function beepCorrect() { beep(880, 120); }
+  function beepWrong() { beep(220, 200); }
+
+  function formatIntegerWithSpaces(n) {
+    const sign = n < 0 ? "-" : "";
+    const s = Math.abs(n).toString();
+    let out = "";
+    for (let i = 0; i < s.length; i++) {
+      const idxFromRight = s.length - i;
+      out += s[i];
+      if (idxFromRight > 1 && idxFromRight % 3 === 1) {
+        out += " ";
+      }
+    }
+    return sign + out;
+  }
+
+  function parseInteger(str) {
+    if (!str) return null;
+    const cleaned = str.replace(/\s+/g, "");
+    if (!/^-?\d+$/.test(cleaned)) return null;
+    const n = parseInt(cleaned, 10);
+    return Number.isNaN(n) ? null : n;
+  }
+
+  const grid = {
+    xmin: -6,
+    xmax: 6,
+    ymin: -6,
+    ymax: 6,
+    padding: 30
+  };
+
+  function getGraphCtx() {
+    return graphCanvas.getContext("2d");
+  }
+
+  function mathToPixel(x, y) {
+    const w = graphCanvas.width;
+    const h = graphCanvas.height;
+    const p = grid.padding;
+    const sx = (w - 2 * p) / (grid.xmax - grid.xmin);
+    const sy = (h - 2 * p) / (grid.ymax - grid.ymin);
+    const px = p + (x - grid.xmin) * sx;
+    const py = h - (p + (y - grid.ymin) * sy);
+    return { x: px, y: py };
+  }
+
+  function pixelToMath(px, py) {
+    const w = graphCanvas.width;
+    const h = graphCanvas.height;
+    const p = grid.padding;
+    const sx = (w - 2 * p) / (grid.xmax - grid.xmin);
+    const sy = (h - 2 * p) / (grid.ymax - grid.ymin);
+    const x = grid.xmin + (px - p) / sx;
+    const y = grid.ymin + (h - py - p) / sy;
+    return { x: x, y: y };
+  }
+
+  function snapToIntegerPoint(px, py) {
+    const math = pixelToMath(px, py);
+    const xi = Math.round(math.x);
+    const yi = Math.round(math.y);
+    if (xi < grid.xmin || xi > grid.xmax || yi < grid.ymin || yi > grid.ymax) {
+      return null;
+    }
+    return { x: xi, y: yi };
+  }
+
+  function drawGrid() {
+    const ctx = getGraphCtx();
+    const w = graphCanvas.width;
+    const h = graphCanvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    ctx.fillStyle = "#020309";
+    ctx.fillRect(0, 0, w, h);
+
+    const p = grid.padding;
+    const sx = (w - 2 * p) / (grid.xmax - grid.xmin);
+    const sy = (h - 2 * p) / (grid.ymax - grid.ymin);
+
+    ctx.lineWidth = 1;
+
+    ctx.strokeStyle = "#1b2134"; // lighter grid
+    for (let x = grid.xmin; x <= grid.xmax; x++) {
+      const px = p + (x - grid.xmin) * sx;
+      ctx.beginPath();
+      ctx.moveTo(px, p);
+      ctx.lineTo(px, h - p);
+      ctx.stroke();
+    }
+    for (let y = grid.ymin; y <= grid.ymax; y++) {
+      const py = h - (p + (y - grid.ymin) * sy);
+      ctx.beginPath();
+      ctx.moveTo(p, py);
+      ctx.lineTo(w - p, py);
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.8;
+    if (grid.xmin <= 0 && grid.xmax >= 0) {
+      const x0 = p + (0 - grid.xmin) * sx;
+      ctx.beginPath();
+      ctx.moveTo(x0, p);
+      ctx.lineTo(x0, h - p);
+      ctx.stroke();
+    }
+    if (grid.ymin <= 0 && grid.ymax >= 0) {
+      const y0 = h - (p + (0 - grid.ymin) * sy);
+      ctx.beginPath();
+      ctx.moveTo(p, y0);
+      ctx.lineTo(w - p, y0);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = "#c5cae9";
+    ctx.font = "10px system-ui";
+
+    if (grid.ymin <= 0 && grid.ymax >= 0) {
+      const y0 = h - (p + (0 - grid.ymin) * sy);
+      for (let x = grid.xmin; x <= grid.xmax; x++) {
+        const px = p + (x - grid.xmin) * sx;
+        ctx.beginPath();
+        ctx.moveTo(px, y0 - 3);
+        ctx.lineTo(px, y0 + 3);
+        ctx.stroke();
+        if (x !== 0) ctx.fillText(String(x), px - 3, y0 + 12);
+      }
+    }
+
+    if (grid.xmin <= 0 && grid.xmax >= 0) {
+      const x0 = p + (0 - grid.xmin) * sx;
+      for (let y = grid.ymin; y <= grid.ymax; y++) {
+        const py = h - (p + (y - grid.ymin) * sy);
+        ctx.beginPath();
+        ctx.moveTo(x0 - 3, py);
+        ctx.lineTo(x0 + 3, py);
+        ctx.stroke();
+        if (y !== 0) ctx.fillText(String(y), x0 + 6, py + 3);
+      }
+    }
+  }
+
+  function drawLineFromEquation(lineDef) {
+    const ctx = getGraphCtx();
+    ctx.save();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = lineDef.color || "#00e5ff";
+
+    const m = lineDef.m;
+    const b = lineDef.b;
+
+    const x1 = grid.xmin - 1;
+    const x2 = grid.xmax + 1;
+    const y1 = m * x1 + b;
+    const y2 = m * x2 + b;
+
+    const p1 = mathToPixel(x1, y1);
+    const p2 = mathToPixel(x2, y2);
+
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawPoint(x, y, color, radius) {
+    const ctx = getGraphCtx();
+    const p = mathToPixel(x, y);
+    ctx.save();
+    ctx.fillStyle = color || "#ffeb3b";
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius || 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ----------- SYSTEM GENERATION (FIXED) -----------
+  function generateSystem(difficulty) {
+    const slopeEasy = [-2, -1, 1, 2];
+    const slopeMed = [-3, -2, -1, 1, 2, 3];
+    const slopeHard = [-4, -3, -2, -1, 1, 2, 3, 4];
+
+    let slopes;
+    if (difficulty === "easy") slopes = slopeEasy;
+    else if (difficulty === "medium") slopes = slopeMed;
+    else slopes = slopeHard;
+
+    let x0, y0, m1, m2, b1, b2;
+    let tries = 0;
+
+    while (true) {
+      tries++;
+      if (tries > 500) {
+        x0 = 1; y0 = 3; m1 = 1; m2 = 2;
+        b1 = y0 - m1 * x0;
+        b2 = y0 - m2 * x0;
+        break;
+      }
+      x0 = randInt(-4, 4);
+      y0 = randInt(-4, 4);
+      if (x0 === 0 && y0 === 0) continue;
+
+      m1 = sample(slopes);
+      do { m2 = sample(slopes); } while (m2 === m1);
+
+      b1 = y0 - m1 * x0;
+      b2 = y0 - m2 * x0;
+
+      if (Math.abs(b1) <= 7 && Math.abs(b2) <= 7) break;
+    }
+
+    function makeLine1() {
+      const color = "#00e5ff";
+      return {
+        m: m1,
+        b: b1,
+        color,
+        display: slopeInterceptText(m1, b1),
+        form: "slope"
+      };
+    }
+
+    function makeLine2() {
+      const color = "#ffab40";
+      if (difficulty === "easy") {
+        return {
+          m: m2,
+          b: b2,
+          color,
+          display: slopeInterceptText(m2, b2),
+          form: "slope"
+        };
+      } else if (difficulty === "medium") {
+        const a = -m2;
+        const standardText = standardFormText(a, 1, b2);
+        return {
+          m: m2,
+          b: b2,
+          color,
+          display: standardText,
+          form: "standard",
+          a: a,
+          c: b2
+        };
+      } else {
+        const k = sample([1, 2, 3]);
+        const a = k;
+        const bcoef = -k * m2;
+        const c = k * (m2 * x0 + b2);
+        const standardText = standardFormGeneralText(a, bcoef, c);
+        return {
+          m: m2,
+          b: b2,
+          color,
+          display: standardText,
+          form: "standard",
+          a: a,
+          bcoef: bcoef,
+          c: c
+        };
+      }
+    }
+
+    const line1 = makeLine1();
+    const line2 = makeLine2();
+
+    return {
+      lines: [line1, line2],
+      solution: { x: x0, y: y0 }
+    };
+  }
+
+  function slopeInterceptText(m, b) {
+    let mPart;
+    if (m === 0) mPart = "0";
+    else if (m === 1) mPart = "x";
+    else if (m === -1) mPart = "-x";
+    else mPart = m + "x";
+
+    if (b === 0) {
+      return m === 0 ? "y = 0" : "y = " + mPart;
+    } else if (b > 0) {
+      return "y = " + mPart + " + " + b;
+    } else {
+      return "y = " + mPart + " - " + Math.abs(b);
+    }
+  }
+
+  function standardFormText(a, b, c) {
+    const xPart = a === 1 ? "x" : (a === -1 ? "-x" : a + "x");
+    const yPart = b === 1 ? "y" : (b === -1 ? "-y" : b + "y");
+
+    let left;
+    if (a !== 0 && b !== 0) {
+      if (b > 0) left = xPart + " + " + yPart;
+      else left = xPart + " - " + Math.abs(b) + "y";
+    } else if (a !== 0) {
+      left = xPart;
+    } else {
+      left = yPart;
+    }
+    return left + " = " + c;
+  }
+
+  function standardFormGeneralText(a, b, c) {
+    const xPart = a === 1 ? "x" : (a === -1 ? "-x" : a + "x");
+    const yAbs = Math.abs(b);
+    const yCore = yAbs === 1 ? "y" : yAbs + "y";
+    let left;
+    if (a !== 0 && b !== 0) {
+      if (b > 0) left = xPart + " + " + yCore;
+      else left = xPart + " - " + yCore;
+    } else if (a !== 0) {
+      left = xPart;
+    } else {
+      left = (b >= 0 ? "" : "-") + yCore;
+    }
+    return left + " = " + c;
+  }
+
+  function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+  function sample(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function chooseGameModeForProblem() {
+    if (state.problemType === "graph") return "graph";
+    if (state.problemType === "algebra") return "algebra";
+    return Math.random() < 0.5 ? "graph" : "algebra";
+  }
+
+  function generateGameProblem() {
+    let difficulty = state.difficulty;
+    if (difficulty === "random") difficulty = sample(["easy", "medium", "hard"]);
+    const system = generateSystem(difficulty);
+    const gameMode = chooseGameModeForProblem();
+    return {
+      difficulty: difficulty,
+      type: gameMode,
+      lines: system.lines,
+      solution: system.solution
+    };
+  }
+
+  function generateWorksheetProblems(count, type, difficulty) {
+    const problems = [];
+    for (let i = 0; i < count; i++) {
+      const sys = generateSystem(difficulty);
+      const pType = type === "mixed" ? (Math.random() < 0.5 ? "graph" : "algebra") : type;
+      problems.push({
+        difficulty,
+        type: pType,
+        lines: sys.lines,
+        solution: sys.solution
+      });
+    }
+    return problems;
+  }
+
+  const graphState = {
+    stage: "drawing",
+    currentLineIndex: 0,
+    points: [[], []],
+    intersectionSelection: null
+  };
+
+  function resetGraphState() {
+    graphState.stage = "drawing";
+    graphState.currentLineIndex = 0;
+    graphState.points = [[], []];
+    graphState.intersectionSelection = null;
+  }
+
+  function renderGraphForProblem() {
+    drawGrid();
+    const prob = state.currentProblem;
+    if (!prob) return;
+
+    graphState.points.forEach((pts, idx) => {
+      const line = prob.lines[idx];
+      if (pts.length >= 2) drawLineFromEquation(line);
+      pts.forEach(pt => {
+        drawPoint(pt.x, pt.y, idx === 0 ? "#00e5ff" : "#ffab40", 4);
+      });
+    });
+
+    if (graphState.intersectionSelection) {
+      drawPoint(graphState.intersectionSelection.x, graphState.intersectionSelection.y, "#ffeb3b", 5);
+    }
+  }
+
+  function handleCanvasClick(evt) {
+    if (!state.currentProblem) return;
+    if (state.gameMode !== "graph") return;
+
+    const rect = graphCanvas.getBoundingClientRect();
+    const px = evt.clientX - rect.left;
+    const py = evt.clientY - rect.top;
+    const snapped = snapToIntegerPoint(px, py);
+    if (!snapped) {
+      setFeedbackDetail("Click inside the grid.");
+      return;
+    }
+
+    const prob = state.currentProblem;
+
+    if (graphState.stage === "drawing") {
+      const idx = graphState.currentLineIndex;
+      const line = prob.lines[idx];
+      const expectedY = line.m * snapped.x + line.b;
+      if (snapped.y !== expectedY) {
+        setFeedbackDetail("Point (" + snapped.x + ", " + snapped.y + ") is not on this line. Try again.");
+        beepWrong();
+        return;
+      }
+      const already = graphState.points[idx].some(p => p.x === snapped.x && p.y === snapped.y);
+      if (already) {
+        setFeedbackDetail("You already selected (" + snapped.x + ", " + snapped.y + ") for this line.");
+        return;
+      }
+      graphState.points[idx].push(snapped);
+      setFeedbackDetail("Point (" + snapped.x + ", " + snapped.y + ") added to Line " + (idx + 1) + ".");
+
+      if (graphState.points[idx].length >= 2) {
+        graphState.currentLineIndex++;
+        if (graphState.currentLineIndex >= 2) {
+          graphState.stage = "intersection";
+          setInstructions("Both lines are drawn. Now click the intersection point and then press Submit.");
+          eq1Badge.textContent = "Done";
+          eq1Badge.classList.remove("active");
+          eq2Badge.textContent = "Done";
+          eq2Badge.classList.remove("active");
+        } else {
+          eq1Badge.classList.remove("active");
+          eq2Badge.classList.remove("active");
+          if (graphState.currentLineIndex === 0) {
+            eq1Badge.textContent = "Drawing";
+            eq1Badge.classList.add("active");
+            eq2Badge.textContent = "Waiting";
+          } else {
+            eq1Badge.textContent = "Done";
+            eq2Badge.textContent = "Drawing";
+            eq2Badge.classList.add("active");
+          }
+          setInstructions("Now click two points on Line " + (graphState.currentLineIndex + 1) + " that satisfy its equation.");
+        }
+      }
+      renderGraphForProblem();
+    } else if (graphState.stage === "intersection") {
+      graphState.intersectionSelection = snapped;
+      setFeedbackDetail("Selected intersection candidate: (" + snapped.x + ", " + snapped.y + "). Press Submit to check.");
+      renderGraphForProblem();
+    }
+  }
+
+  function setInstructions(text) {
+    instructionsEl.textContent = text;
+    ariaStatus.textContent = text;
+  }
+
+  function setFeedback(mainText, isCorrect, detail) {
+    feedbackMain.textContent = mainText || "";
+    feedbackMain.classList.remove("ok", "bad");
+    if (isCorrect === true) feedbackMain.classList.add("ok");
+    if (isCorrect === false) feedbackMain.classList.add("bad");
+    feedbackDetail.textContent = detail || "";
+  }
+
+  function setFeedbackDetail(text) {
+    feedbackDetail.textContent = text || "";
+  }
+
+  function updateScorePanel() {
+    scoreValue.textContent = state.score;
+    streakValue.textContent = state.streak;
+    correctValue.textContent = state.correct;
+    totalValue.textContent = state.total;
+    const acc = state.total > 0 ? Math.round((state.correct / state.total) * 100) : 0;
+    accuracyValue.textContent = acc + "%";
+  }
+
+  function addIncorrect(problem, studentAnswer, reason) {
+    state.incorrectProblems.push({ problem, answer: studentAnswer, reason });
+    renderIncorrectList();
+  }
+
+  function renderIncorrectList() {
+    incorrectList.innerHTML = "";
+    if (state.incorrectProblems.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "No incorrect problems in this session so far.";
+      incorrectList.appendChild(li);
+      return;
+    }
+    state.incorrectProblems.forEach((item, idx) => {
+      const li = document.createElement("li");
+      const p = item.problem;
+      const eqs = p.lines[0].display + " ; " + p.lines[1].display;
+      const sol = "(" + p.solution.x + ", " + p.solution.y + ")";
+      li.textContent =
+        (idx + 1) + ". [" + p.type.toUpperCase() + "] " +
+        eqs + " | Correct solution: " + sol +
+        (item.answer ? " | Your answer: " + item.answer : "") +
+        (item.reason ? " | " + item.reason : "");
+      incorrectList.appendChild(li);
+    });
+  }
+
+  function setModeTags() {
+    const m = state.currentProblem ? state.currentProblem.type : state.gameMode;
+    modeTag.textContent = "Mode: " + (m === "graph" ? "Graph" : "Algebra");
+    const d =
+      state.difficulty === "random"
+        ? "Random (" + (state.currentProblem ? state.currentProblem.difficulty : "") + ")"
+        : capitalize(state.difficulty);
+    difficultyTag.textContent = "Difficulty: " + d;
+  }
+
+  function capitalize(s) {
+    return s ? s[0].toUpperCase() + s.slice(1) : s;
+  }
+
+  function startTimer() {
+    stopTimer();
+    if (!state.timerEnabled) {
+      timerTag.style.display = "none";
+      return;
+    }
+    state.timerRemaining = state.timerSeconds;
+    timerValue.textContent = state.timerRemaining;
+    timerTag.style.display = "inline-block";
+    state.timerId = setInterval(() => {
+      state.timerRemaining--;
+      if (state.timerRemaining < 0) {
+        stopTimer();
+        timerValue.textContent = "0";
+        if (!state.awaitingNext) handleTimeout();
+        return;
+      }
+      timerValue.textContent = state.timerRemaining;
+    }, 1000);
+  }
+
+  function stopTimer() {
+    if (state.timerId !== null) {
+      clearInterval(state.timerId);
+      state.timerId = null;
+    }
+  }
+
+  function handleTimeout() {
+    state.total++;
+    state.streak = 0;
+    updateScorePanel();
+    setFeedback("Time is up!", false, "Try the next problem.");
+    beepWrong();
+    state.awaitingNext = true;
+    showStepsBtn.disabled = false;
+  }
+
+  function loadNewProblem() {
+    state.currentProblem = generateGameProblem();
+    state.gameMode = state.currentProblem.type;
+    state.awaitingNext = false;
+    showStepsBtn.disabled = true;
+    clearInputs();
+    resetGraphState();
+    renderProblem();
+    startTimer();
+  }
+
+  function renderProblem() {
+    const prob = state.currentProblem;
+    if (!prob) return;
+    setModeTags();
+
+    if (prob.type === "graph") {
+      graphContainer.style.display = "block";
+      algebraInputs.style.display = "none";
+      eq1Text.textContent = prob.lines[0].display;
+      eq2Text.textContent = prob.lines[1].display;
+      eq1Badge.textContent = "Drawing";
+      eq1Badge.classList.add("active");
+      eq2Badge.textContent = "Waiting";
+      eq2Badge.classList.remove("active");
+      setInstructions("Click two points on Line 1 that satisfy its equation. Then do the same for Line 2. Finally, click the intersection point and press Submit.");
+      drawGrid();
+    } else {
+      graphContainer.style.display = "none";
+      algebraInputs.style.display = "grid";
+      eq1Text.textContent = prob.lines[0].display;
+      eq2Text.textContent = prob.lines[1].display;
+      eq1Badge.textContent = "Algebra";
+      eq2Badge.textContent = "Algebra";
+      eq1Badge.classList.remove("active");
+      eq2Badge.classList.remove("active");
+      setInstructions("Solve the system algebraically. Enter the integer solution for x and y, then press Submit.");
+      inputX.focus();
+    }
+
+    setFeedback("", null, "");
+  }
+
+  function clearInputs() {
+    inputX.value = "";
+    inputY.value = "";
+  }
+
+  function handleSubmit() {
+    if (!state.currentProblem) return;
+    if (state.awaitingNext) {
+      setFeedbackDetail("Press Next to move to a new problem.");
+      return;
+    }
+
+    stopTimer();
+    const prob = state.currentProblem;
+    let isCorrect = false;
+    let studentAnswer = "";
+
+    if (prob.type === "graph") {
+      if (graphState.points[0].length < 2 || graphState.points[1].length < 2) {
+        setFeedback("Lines are not complete.", false, "Click two valid points on each line before submitting.");
+        beepWrong();
+        return;
+      }
+      if (!graphState.intersectionSelection) {
+        setFeedback("Intersection not selected.", false, "Click the intersection point on the grid, then press Submit.");
+        beepWrong();
+        return;
+      }
+      const sel = graphState.intersectionSelection;
+      studentAnswer = "(" + sel.x + ", " + sel.y + ")";
+      if (sel.x === prob.solution.x && sel.y === prob.solution.y) isCorrect = true;
+    } else {
+      const xVal = parseInteger(inputX.value.trim());
+      const yVal = parseInteger(inputY.value.trim());
+      if (xVal === null || yVal === null) {
+        setFeedback("Please enter integer values for x and y.", false, "Only whole numbers are allowed, e.g. -3, 0, 4.");
+        beepWrong();
+        return;
+      }
+      studentAnswer = "(" + xVal + ", " + yVal + ")";
+      if (xVal === prob.solution.x && yVal === prob.solution.y) isCorrect = true;
+    }
+
+    state.total++;
+    if (isCorrect) {
+      state.score += 10;
+      state.streak++;
+      if (state.streak > 0 && state.streak % 5 === 0) state.score += 5;
+      state.correct++;
+      setFeedback("Correct!", true, "Press Next for a new problem.");
+      beepCorrect();
+    } else {
+      addIncorrect(prob, studentAnswer, "");
+      state.streak = 0;
+      const correctSol = "(" + prob.solution.x + ", " + prob.solution.y + ")";
+      setFeedback("Not quite.", false, "The correct solution is " + correctSol + ". Press Show steps for an explanation, or Next for a new problem.");
+      beepWrong();
+      showStepsBtn.disabled = false;
+    }
+
+    state.awaitingNext = true;
+    updateScorePanel();
+  }
+
+  function handleNext() {
+    loadNewProblem();
+  }
+
+  function handleClear() {
+    if (!state.currentProblem) return;
+    if (state.currentProblem.type === "graph") {
+      resetGraphState();
+      drawGrid();
+      setInstructions("Click two points on Line 1 that satisfy its equation. Then do the same for Line 2. Finally, click the intersection point and press Submit.");
+      eq1Badge.textContent = "Drawing";
+      eq1Badge.classList.add("active");
+      eq2Badge.textContent = "Waiting";
+      eq2Badge.classList.remove("active");
+    } else {
+      clearInputs();
+      inputX.focus();
+    }
+    setFeedbackDetail("");
+  }
+
+  function handleShowSteps() {
+    const prob = state.currentProblem;
+    if (!prob) return;
+    const sol = prob.solution;
+    let detail = "";
+
+    if (prob.type === "graph") {
+      const l1 = prob.lines[0];
+      const l2 = prob.lines[1];
+      detail =
+        "To solve graphically, draw both lines.\n" +
+        "Line 1: " + l1.display + "\n" +
+        "Line 2: " + l2.display + "\n" +
+        "Both lines intersect at the point (" + sol.x + ", " + sol.y + ").\n" +
+        "On the grid, this is where the two lines cross.";
+    } else {
+      detail =
+        "One algebraic method is substitution or elimination.\n" +
+        "Solve one equation for y or x, substitute into the other, and solve step by step.\n" +
+        "For this system, the solution is (" + sol.x + ", " + sol.y + ").\n" +
+        "You can check by plugging x = " + sol.x + " and y = " + sol.y +
+        " into both equations to see they are true.";
+    }
+
+    feedbackDetail.textContent = detail;
+  }
+
+  function renderWorksheet() {
+    worksheetList.innerHTML = "";
+    if (worksheetState.problems.length === 0) {
+      const p = document.createElement("p");
+      p.style.color = "var(--muted)";
+      p.style.fontSize = "0.9rem";
+      p.textContent =
+        "Choose how many questions you want and click \"Generate worksheet\" to create a fresh set of problems.";
+      worksheetList.appendChild(p);
+      return;
+    }
+
+    worksheetState.problems.forEach((prob, idx) => {
+      const item = document.createElement("div");
+      item.className = "worksheet-item";
+
+      const q = document.createElement("div");
+      q.textContent =
+        (idx + 1) + ". (" + prob.type.toUpperCase() + ")  " +
+        prob.lines[0].display + "    and    " +
+        prob.lines[1].display;
+      item.appendChild(q);
+
+      const ans = document.createElement("div");
+      ans.className = "worksheet-answer";
+      ans.textContent = "Solution: (" + prob.solution.x + ", " + prob.solution.y + ")";
+      item.appendChild(ans);
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "secondary";
+      btn.style.marginTop = "4px";
+      btn.textContent = "Show answer";
+      btn.addEventListener("click", () => {
+        const visible = ans.classList.toggle("visible");
+        btn.textContent = visible ? "Hide answer" : "Show answer";
+      });
+      item.appendChild(btn);
+
+      worksheetList.appendChild(item);
+    });
+  }
+
+  function revealAllWorksheetAnswers(show) {
+    const answers = worksheetList.querySelectorAll(".worksheet-answer");
+    const buttons = worksheetList.querySelectorAll(".worksheet-item button.secondary");
+    answers.forEach((ans, idx) => {
+      if (show) ans.classList.add("visible");
+      else ans.classList.remove("visible");
+      if (buttons[idx]) buttons[idx].textContent = show ? "Hide answer" : "Show answer";
+    });
+  }
+
+  toggleHighContrast.addEventListener("change", () => {
+    if (toggleHighContrast.checked) body.classList.remove("high-contrast-off");
+    else body.classList.add("high-contrast-off");
+  });
+
+  toggleSound.addEventListener("change", () => { state.soundOn = toggleSound.checked; });
+
+  toggleTimer.addEventListener("change", () => {
+    state.timerEnabled = toggleTimer.checked;
+    timerSelect.disabled = !state.timerEnabled;
+    if (!state.timerEnabled) {
+      stopTimer();
+      timerTag.style.display = "none";
+    } else {
+      state.timerSeconds = parseInt(timerSelect.value, 10) || 60;
+      startTimer();
+    }
+  });
+
+  timerSelect.addEventListener("change", () => {
+    state.timerSeconds = parseInt(timerSelect.value, 10) || 60;
+    if (state.timerEnabled) startTimer();
+  });
+
+  difficultyChips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      difficultyChips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      state.difficulty = chip.getAttribute("data-difficulty");
+      loadNewProblem();
+    });
+  });
+
+  problemTypeChips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      problemTypeChips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      state.problemType = chip.getAttribute("data-problemtype");
+      loadNewProblem();
+    });
+  });
+
+  mainModeTabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      mainModeTabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active");
+      state.mainMode = tab.getAttribute("data-mainmode");
+      if (state.mainMode === "game") {
+        gameView.style.display = "grid";
+        worksheetView.style.display = "none";
+      } else {
+        gameView.style.display = "none";
+        worksheetView.style.display = "block";
+      }
+    });
+  });
+
+  worksheetCountChips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      worksheetCountChips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      worksheetState.count = parseInt(chip.getAttribute("data-wq"), 10);
+    });
+  });
+
+  worksheetTypeChips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      worksheetTypeChips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      worksheetState.type = chip.getAttribute("data-wtype");
+    });
+  });
+
+  generateWorksheetBtn.addEventListener("click", () => {
+    const diff = state.difficulty === "random"
+      ? sample(["easy", "medium", "hard"])
+      : state.difficulty;
+    worksheetState.problems = generateWorksheetProblems(
+      worksheetState.count,
+      worksheetState.type,
+      diff
+    );
+    renderWorksheet();
+  });
+
+  revealAllBtn.addEventListener("click", () => revealAllWorksheetAnswers(true));
+  hideAllBtn.addEventListener("click", () => revealAllWorksheetAnswers(false));
+
+  submitBtn.addEventListener("click", handleSubmit);
+  nextBtn.addEventListener("click", handleNext);
+  clearBtn.addEventListener("click", handleClear);
+  showStepsBtn.addEventListener("click", handleShowSteps);
+
+  toggleSummaryBtn.addEventListener("click", () => {
+    const visible = summaryContent.style.display === "block";
+    summaryContent.style.display = visible ? "none" : "block";
+    toggleSummaryBtn.textContent = visible
+      ? "Show incorrect problems"
+      : "Hide incorrect problems";
+  });
+
+  graphCanvas.addEventListener("click", handleCanvasClick);
+
+  document.addEventListener("keydown", (evt) => {
+    if (evt.key === "Enter") {
+      if (state.awaitingNext) handleNext();
+      else handleSubmit();
+      evt.preventDefault();
+    } else if (evt.key === "Escape") {
+      handleClear();
+      evt.preventDefault();
+    }
+  });
+
+  function runDevTests() {
+    if (!hasDevMode()) return;
+    devPanel.classList.add("visible");
+    const tests = [];
+    function addTest(name, fn) {
+      try {
+        const ok = fn();
+        tests.push({ name, ok });
+      } catch (e) {
+        tests.push({ name, ok: false });
+      }
+    }
+
+    addTest("System generator yields integer solution", () => {
+      const s = generateSystem("easy");
+      return Number.isInteger(s.solution.x) && Number.isInteger(s.solution.y);
+    });
+    addTest("System generator slopes differ", () => {
+      const s = generateSystem("easy");
+      return s.lines[0].m !== s.lines[1].m;
+    });
+    addTest("Graph snapping within range", () => {
+      const p = mathToPixel(0, 0);
+      const snapped = snapToIntegerPoint(p.x, p.y);
+      return snapped && snapped.x === 0 && snapped.y === 0;
+    });
+    addTest("Integer parse accepts spaced thousands", () => parseInteger("12 345") === 12345);
+    addTest("Integer parse rejects decimal", () => parseInteger("3.5") === null);
+    addTest("Format integer with spaces", () => formatIntegerWithSpaces(12345) === "12 345");
+    addTest("Game problem respects difficulty randomization", () => {
+      state.difficulty = "random";
+      const p = generateGameProblem();
+      return ["easy", "medium", "hard"].includes(p.difficulty);
+    });
+    addTest("Worksheet generator count", () => {
+      const arr = generateWorksheetProblems(7, "mixed", "easy");
+      return arr.length === 7;
+    });
+    addTest("Graph default stage drawing", () => graphState.stage === "drawing");
+    addTest("Timer default off", () => state.timerEnabled === false);
+
+    devList.innerHTML = "";
+    tests.forEach(t => {
+      const li = document.createElement("li");
+      li.textContent = (t.ok ? "✔ " : "✖ ") + t.name;
+      li.className = t.ok ? "ok" : "fail";
+      devList.appendChild(li);
+    });
+  }
+
+  function init() {
+    body.classList.remove("high-contrast-off");
+    state.soundOn = toggleSound.checked;
+    state.timerEnabled = toggleTimer.checked;
+    state.timerSeconds = parseInt(timerSelect.value, 10) || 60;
+    renderIncorrectList();
+    renderWorksheet();
+    loadNewProblem();
+    if (hasDevMode()) runDevTests();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
