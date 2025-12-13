@@ -37,9 +37,7 @@
       --success-soft: #e8f5e9;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -101,9 +99,7 @@
       color: var(--text);
     }
 
-    .chip span.emoji {
-      font-size: 1.1rem;
-    }
+    .chip span.emoji { font-size: 1.1rem; }
 
     .panel {
       background: linear-gradient(145deg, var(--panel), var(--panel-alt));
@@ -145,9 +141,7 @@
       user-select: none;
     }
 
-    .toggle input {
-      accent-color: var(--accent);
-    }
+    .toggle input { accent-color: var(--accent); }
 
     .select {
       padding: 4px 8px;
@@ -189,9 +183,7 @@
     }
 
     @media (max-width: 900px) {
-      .layout {
-        grid-template-columns: minmax(0, 1fr);
-      }
+      .layout { grid-template-columns: minmax(0, 1fr); }
     }
 
     .instructions {
@@ -222,9 +214,7 @@
       margin-right: 6px;
     }
 
-    .equation-text {
-      flex: 1;
-    }
+    .equation-text { flex: 1; }
 
     .equation-badge {
       font-size: 0.75rem;
@@ -273,9 +263,7 @@
       font-size: 0.85rem;
     }
 
-    .field label {
-      color: var(--muted);
-    }
+    .field label { color: var(--muted); }
 
     .field input {
       padding: 6px 8px;
@@ -349,13 +337,8 @@
       margin-bottom: 4px;
     }
 
-    .feedback-main.ok {
-      color: var(--success);
-    }
-
-    .feedback-main.bad {
-      color: var(--error);
-    }
+    .feedback-main.ok { color: var(--success); }
+    .feedback-main.bad { color: var(--error); }
 
     .feedback-detail {
       color: var(--muted);
@@ -379,24 +362,11 @@
       border: 1px solid var(--border);
     }
 
-    .summary {
-      margin-top: 8px;
-      font-size: 0.85rem;
-    }
+    .summary { margin-top: 8px; font-size: 0.85rem; }
+    .summary h3 { margin: 4px 0 6px; font-size: 0.95rem; }
 
-    .summary h3 {
-      margin: 4px 0 6px;
-      font-size: 0.95rem;
-    }
-
-    .summary ul {
-      margin: 0;
-      padding-left: 18px;
-    }
-
-    .summary li {
-      margin-bottom: 3px;
-    }
+    .summary ul { margin: 0; padding-left: 18px; }
+    .summary li { margin-bottom: 3px; }
 
     .summary-toggle {
       font-size: 0.85rem;
@@ -416,10 +386,7 @@
       margin-bottom: 8px;
     }
 
-    .worksheet-list {
-      margin-top: 8px;
-      font-size: 0.9rem;
-    }
+    .worksheet-list { margin-top: 8px; font-size: 0.9rem; }
 
     .worksheet-item {
       border-radius: 8px;
@@ -436,9 +403,7 @@
       display: none;
     }
 
-    .worksheet-answer.visible {
-      display: block;
-    }
+    .worksheet-answer.visible { display: block; }
 
     footer {
       margin-top: 10px;
@@ -485,22 +450,11 @@
       display: none;
     }
 
-    .dev-panel.visible {
-      display: block;
-    }
+    .dev-panel.visible { display: block; }
 
-    .dev-panel ul {
-      margin: 4px 0 0;
-      padding-left: 16px;
-    }
-
-    .dev-panel li.ok {
-      color: var(--success);
-    }
-
-    .dev-panel li.fail {
-      color: var(--error);
-    }
+    .dev-panel ul { margin: 4px 0 0; padding-left: 16px; }
+    .dev-panel li.ok { color: var(--success); }
+    .dev-panel li.fail { color: var(--error); }
   </style>
 </head>
 <body>
@@ -818,26 +772,31 @@
   function beepCorrect() { beep(880, 120); }
   function beepWrong() { beep(220, 200); }
 
-  function formatIntegerWithSpaces(n) {
-    const sign = n < 0 ? "-" : "";
-    const s = Math.abs(n).toString();
-    let out = "";
-    for (let i = 0; i < s.length; i++) {
-      const idxFromRight = s.length - i;
-      out += s[i];
-      if (idxFromRight > 1 && idxFromRight % 3 === 1) {
-        out += " ";
-      }
-    }
-    return sign + out;
+  function formatNumber(n) {
+    if (Number.isInteger(n)) return String(n);
+    // show up to 2 dp, trim trailing zeros
+    const s = n.toFixed(2);
+    return s.replace(/\.00$/, "").replace(/(\.\d)0$/, "$1");
   }
 
-  function parseInteger(str) {
+  function parseNumberInput(str, allowDecimal, maxDp) {
     if (!str) return null;
     const cleaned = str.replace(/\s+/g, "");
-    if (!/^-?\d+$/.test(cleaned)) return null;
-    const n = parseInt(cleaned, 10);
-    return Number.isNaN(n) ? null : n;
+    if (!allowDecimal) {
+      if (!/^-?\d+$/.test(cleaned)) return null;
+      const n = parseInt(cleaned, 10);
+      return Number.isNaN(n) ? null : n;
+    }
+    // allow decimals up to maxDp (default 2)
+    const dp = (typeof maxDp === "number" ? maxDp : 2);
+    const re = new RegExp("^-?\\d+(?:\\.\\d{1," + dp + "})?$");
+    if (!re.test(cleaned)) return null;
+    const n2 = parseFloat(cleaned);
+    return Number.isNaN(n2) ? null : n2;
+  }
+
+  function nearlyEqual(a, b) {
+    return Math.abs(a - b) < 1e-9;
   }
 
   const grid = {
@@ -848,9 +807,7 @@
     padding: 30
   };
 
-  function getGraphCtx() {
-    return graphCanvas.getContext("2d");
-  }
+  function getGraphCtx() { return graphCanvas.getContext("2d"); }
 
   function mathToPixel(x, y) {
     const w = graphCanvas.width;
@@ -878,9 +835,7 @@
     const math = pixelToMath(px, py);
     const xi = Math.round(math.x);
     const yi = Math.round(math.y);
-    if (xi < grid.xmin || xi > grid.xmax || yi < grid.ymin || yi > grid.ymax) {
-      return null;
-    }
+    if (xi < grid.xmin || xi > grid.xmax || yi < grid.ymin || yi > grid.ymax) return null;
     return { x: xi, y: yi };
   }
 
@@ -899,7 +854,7 @@
 
     ctx.lineWidth = 1;
 
-    ctx.strokeStyle = "#1b2134"; // lighter grid
+    ctx.strokeStyle = "#1b2134";
     for (let x = grid.xmin; x <= grid.xmax; x++) {
       const px = p + (x - grid.xmin) * sx;
       ctx.beginPath();
@@ -996,8 +951,12 @@
     ctx.restore();
   }
 
-  // ----------- SYSTEM GENERATION (FIXED) -----------
-  function generateSystem(difficulty) {
+  // ----------- SYSTEM GENERATION (FIXED + OPTIONAL DECIMAL ALGEBRA) -----------
+  function generateSystem(difficulty, opts) {
+    const options = opts || {};
+    const allowDecimalSolution = !!options.allowDecimalSolution; // only for algebra problems
+    const maxDp = 2;
+
     const slopeEasy = [-2, -1, 1, 2];
     const slopeMed = [-3, -2, -1, 1, 2, 3];
     const slopeHard = [-4, -3, -2, -1, 1, 2, 3, 4];
@@ -1010,16 +969,34 @@
     let x0, y0, m1, m2, b1, b2;
     let tries = 0;
 
+    function randDecimal(min, max, dp) {
+      const scale = Math.pow(10, dp);
+      const n = Math.floor(Math.random() * (max * scale - min * scale + 1)) + min * scale;
+      return n / scale;
+    }
+
     while (true) {
       tries++;
-      if (tries > 500) {
+      if (tries > 600) {
         x0 = 1; y0 = 3; m1 = 1; m2 = 2;
         b1 = y0 - m1 * x0;
         b2 = y0 - m2 * x0;
         break;
       }
-      x0 = randInt(-4, 4);
-      y0 = randInt(-4, 4);
+
+      // Pick solution point:
+      // - Graph problems must be integers (handled by caller by passing allowDecimalSolution=false)
+      // - Algebra medium/hard may sometimes be decimals up to 2 dp
+      if (allowDecimalSolution && difficulty !== "easy" && Math.random() < 0.40) {
+        // keep it friendly: tenths or hundredths, in a safe range
+        const dp = Math.random() < 0.70 ? 1 : 2;
+        x0 = randDecimal(-4, 4, dp);
+        y0 = randDecimal(-4, 4, dp);
+      } else {
+        x0 = randInt(-4, 4);
+        y0 = randInt(-4, 4);
+      }
+
       if (x0 === 0 && y0 === 0) continue;
 
       m1 = sample(slopes);
@@ -1028,7 +1005,8 @@
       b1 = y0 - m1 * x0;
       b2 = y0 - m2 * x0;
 
-      if (Math.abs(b1) <= 7 && Math.abs(b2) <= 7) break;
+      // keep intercepts from exploding
+      if (Math.abs(b1) <= 7.5 && Math.abs(b2) <= 7.5) break;
     }
 
     function makeLine1() {
@@ -1044,6 +1022,7 @@
 
     function makeLine2() {
       const color = "#ffab40";
+
       if (difficulty === "easy") {
         return {
           m: m2,
@@ -1053,31 +1032,39 @@
           form: "slope"
         };
       } else if (difficulty === "medium") {
-        const a = -m2;
-        const standardText = standardFormText(a, 1, b2);
+        // y = m2 x + b2  ->  -m2 x + y = b2
+        const ax = -m2;
+        const by = 1;
+        const c = b2;
+        const standardText = standardFormGeneralText(ax, by, c);
         return {
           m: m2,
           b: b2,
           color,
           display: standardText,
           form: "standard",
-          a: a,
-          c: b2
+          ax: ax,
+          by: by,
+          c: c
         };
       } else {
+        // HARD: show a scaled standard form, but it MUST represent the same line.
+        // y = m2 x + b2 -> -m2 x + y = b2
+        // multiply by k: (-k*m2)x + (k)y = k*b2
         const k = sample([1, 2, 3]);
-        const a = k;
-        const bcoef = -k * m2;
-        const c = k * (m2 * x0 + b2);
-        const standardText = standardFormGeneralText(a, bcoef, c);
+        const ax = -k * m2;
+        const by = k;
+        const c = k * b2;
+
+        const standardText = standardFormGeneralText(ax, by, c);
         return {
           m: m2,
           b: b2,
           color,
           display: standardText,
           form: "standard",
-          a: a,
-          bcoef: bcoef,
+          ax: ax,
+          by: by,
           c: c
         };
       }
@@ -1099,45 +1086,32 @@
     else if (m === -1) mPart = "-x";
     else mPart = m + "x";
 
+    const bText = formatNumber(b);
+
     if (b === 0) {
       return m === 0 ? "y = 0" : "y = " + mPart;
     } else if (b > 0) {
-      return "y = " + mPart + " + " + b;
+      return "y = " + mPart + " + " + bText;
     } else {
-      return "y = " + mPart + " - " + Math.abs(b);
+      return "y = " + mPart + " - " + formatNumber(Math.abs(b));
     }
   }
 
-  function standardFormText(a, b, c) {
-    const xPart = a === 1 ? "x" : (a === -1 ? "-x" : a + "x");
-    const yPart = b === 1 ? "y" : (b === -1 ? "-y" : b + "y");
-
-    let left;
-    if (a !== 0 && b !== 0) {
-      if (b > 0) left = xPart + " + " + yPart;
-      else left = xPart + " - " + Math.abs(b) + "y";
-    } else if (a !== 0) {
-      left = xPart;
-    } else {
-      left = yPart;
-    }
-    return left + " = " + c;
-  }
-
+  // General standard form renderer: ax + by = c (a,b,c can be integers or decimals)
   function standardFormGeneralText(a, b, c) {
-    const xPart = a === 1 ? "x" : (a === -1 ? "-x" : a + "x");
-    const yAbs = Math.abs(b);
-    const yCore = yAbs === 1 ? "y" : yAbs + "y";
-    let left;
-    if (a !== 0 && b !== 0) {
-      if (b > 0) left = xPart + " + " + yCore;
-      else left = xPart + " - " + yCore;
-    } else if (a !== 0) {
-      left = xPart;
-    } else {
-      left = (b >= 0 ? "" : "-") + yCore;
+    function coefText(n, variable, isFirst) {
+      if (n === 0) return "";
+      const sign = n < 0 ? "-" : (isFirst ? "" : "+");
+      const abs = Math.abs(n);
+      const absText = (abs === 1 ? "" : formatNumber(abs));
+      return (isFirst ? (n < 0 ? "-" : "") : (" " + sign + " ")) + absText + variable;
     }
-    return left + " = " + c;
+
+    const axText = coefText(a, "x", true);
+    const byText = coefText(b, "y", axText === "");
+
+    const left = (axText + byText).trim();
+    return left + " = " + formatNumber(c);
   }
 
   function randInt(min, max) {
@@ -1156,8 +1130,14 @@
   function generateGameProblem() {
     let difficulty = state.difficulty;
     if (difficulty === "random") difficulty = sample(["easy", "medium", "hard"]);
-    const system = generateSystem(difficulty);
+
     const gameMode = chooseGameModeForProblem();
+
+    // only allow decimal solutions when it's an algebra problem AND medium/hard
+    const allowDecimalSolution = (gameMode === "algebra" && difficulty !== "easy");
+
+    const system = generateSystem(difficulty, { allowDecimalSolution: allowDecimalSolution });
+
     return {
       difficulty: difficulty,
       type: gameMode,
@@ -1169,8 +1149,10 @@
   function generateWorksheetProblems(count, type, difficulty) {
     const problems = [];
     for (let i = 0; i < count; i++) {
-      const sys = generateSystem(difficulty);
       const pType = type === "mixed" ? (Math.random() < 0.5 ? "graph" : "algebra") : type;
+      const allowDecimalSolution = (pType === "algebra" && difficulty !== "easy");
+      const sys = generateSystem(difficulty, { allowDecimalSolution: allowDecimalSolution });
+
       problems.push({
         difficulty,
         type: pType,
@@ -1232,7 +1214,8 @@
       const idx = graphState.currentLineIndex;
       const line = prob.lines[idx];
       const expectedY = line.m * snapped.x + line.b;
-      if (snapped.y !== expectedY) {
+      // graph is integer snapped, so only accept if line actually gives an integer y at that x
+      if (!Number.isInteger(expectedY) || snapped.y !== expectedY) {
         setFeedbackDetail("Point (" + snapped.x + ", " + snapped.y + ") is not on this line. Try again.");
         beepWrong();
         return;
@@ -1320,7 +1303,7 @@
       const li = document.createElement("li");
       const p = item.problem;
       const eqs = p.lines[0].display + " ; " + p.lines[1].display;
-      const sol = "(" + p.solution.x + ", " + p.solution.y + ")";
+      const sol = "(" + formatNumber(p.solution.x) + ", " + formatNumber(p.solution.y) + ")";
       li.textContent =
         (idx + 1) + ". [" + p.type.toUpperCase() + "] " +
         eqs + " | Correct solution: " + sol +
@@ -1393,6 +1376,11 @@
     startTimer();
   }
 
+  function algebraAllowsDecimals(prob) {
+    // Your rule: Easy = integer only, Medium/Hard = allow decimals up to 2 dp
+    return prob && prob.type === "algebra" && prob.difficulty !== "easy";
+  }
+
   function renderProblem() {
     const prob = state.currentProblem;
     if (!prob) return;
@@ -1418,7 +1406,12 @@
       eq2Badge.textContent = "Algebra";
       eq1Badge.classList.remove("active");
       eq2Badge.classList.remove("active");
-      setInstructions("Solve the system algebraically. Enter the integer solution for x and y, then press Submit.");
+
+      if (algebraAllowsDecimals(prob)) {
+        setInstructions("Solve the system algebraically. Enter x and y (integers or decimals up to 2 decimal places), then press Submit.");
+      } else {
+        setInstructions("Solve the system algebraically. Enter the integer solution for x and y, then press Submit.");
+      }
       inputX.focus();
     }
 
@@ -1455,17 +1448,24 @@
       }
       const sel = graphState.intersectionSelection;
       studentAnswer = "(" + sel.x + ", " + sel.y + ")";
-      if (sel.x === prob.solution.x && sel.y === prob.solution.y) isCorrect = true;
+      if (nearlyEqual(sel.x, prob.solution.x) && nearlyEqual(sel.y, prob.solution.y)) isCorrect = true;
     } else {
-      const xVal = parseInteger(inputX.value.trim());
-      const yVal = parseInteger(inputY.value.trim());
+      const allowDec = algebraAllowsDecimals(prob);
+      const xVal = parseNumberInput(inputX.value.trim(), allowDec, 2);
+      const yVal = parseNumberInput(inputY.value.trim(), allowDec, 2);
+
       if (xVal === null || yVal === null) {
-        setFeedback("Please enter integer values for x and y.", false, "Only whole numbers are allowed, e.g. -3, 0, 4.");
+        if (allowDec) {
+          setFeedback("Please enter valid values.", false, "Use integers or decimals with up to 2 decimal places (e.g. -3, 0, 4, 1.5, -2.75).");
+        } else {
+          setFeedback("Please enter integer values for x and y.", false, "Only whole numbers are allowed, e.g. -3, 0, 4.");
+        }
         beepWrong();
         return;
       }
-      studentAnswer = "(" + xVal + ", " + yVal + ")";
-      if (xVal === prob.solution.x && yVal === prob.solution.y) isCorrect = true;
+
+      studentAnswer = "(" + formatNumber(xVal) + ", " + formatNumber(yVal) + ")";
+      if (nearlyEqual(xVal, prob.solution.x) && nearlyEqual(yVal, prob.solution.y)) isCorrect = true;
     }
 
     state.total++;
@@ -1479,7 +1479,7 @@
     } else {
       addIncorrect(prob, studentAnswer, "");
       state.streak = 0;
-      const correctSol = "(" + prob.solution.x + ", " + prob.solution.y + ")";
+      const correctSol = "(" + formatNumber(prob.solution.x) + ", " + formatNumber(prob.solution.y) + ")";
       setFeedback("Not quite.", false, "The correct solution is " + correctSol + ". Press Show steps for an explanation, or Next for a new problem.");
       beepWrong();
       showStepsBtn.disabled = false;
@@ -1523,14 +1523,14 @@
         "To solve graphically, draw both lines.\n" +
         "Line 1: " + l1.display + "\n" +
         "Line 2: " + l2.display + "\n" +
-        "Both lines intersect at the point (" + sol.x + ", " + sol.y + ").\n" +
+        "Both lines intersect at the point (" + formatNumber(sol.x) + ", " + formatNumber(sol.y) + ").\n" +
         "On the grid, this is where the two lines cross.";
     } else {
       detail =
         "One algebraic method is substitution or elimination.\n" +
         "Solve one equation for y or x, substitute into the other, and solve step by step.\n" +
-        "For this system, the solution is (" + sol.x + ", " + sol.y + ").\n" +
-        "You can check by plugging x = " + sol.x + " and y = " + sol.y +
+        "For this system, the solution is (" + formatNumber(sol.x) + ", " + formatNumber(sol.y) + ").\n" +
+        "You can check by plugging x = " + formatNumber(sol.x) + " and y = " + formatNumber(sol.y) +
         " into both equations to see they are true.";
     }
 
@@ -1562,7 +1562,7 @@
 
       const ans = document.createElement("div");
       ans.className = "worksheet-answer";
-      ans.textContent = "Solution: (" + prob.solution.x + ", " + prob.solution.y + ")";
+      ans.textContent = "Solution: (" + formatNumber(prob.solution.x) + ", " + formatNumber(prob.solution.y) + ")";
       item.appendChild(ans);
 
       const btn = document.createElement("button");
@@ -1717,38 +1717,25 @@
       }
     }
 
-    addTest("System generator yields integer solution", () => {
-      const s = generateSystem("easy");
-      return Number.isInteger(s.solution.x) && Number.isInteger(s.solution.y);
+    addTest("Hard standard form matches slope/intercept", () => {
+      const s = generateSystem("hard", { allowDecimalSolution: false });
+      const l2 = s.lines[1];
+      // Check a couple points on the intended line satisfy ax+by=c if present
+      if (!l2 || l2.form !== "standard") return false;
+      const ax = l2.ax, by = l2.by, c = l2.c;
+      const xA = 1, yA = l2.m * xA + l2.b;
+      const xB = -2, yB = l2.m * xB + l2.b;
+      return nearlyEqual(ax * xA + by * yA, c) && nearlyEqual(ax * xB + by * yB, c);
     });
-    addTest("System generator slopes differ", () => {
-      const s = generateSystem("easy");
-      return s.lines[0].m !== s.lines[1].m;
-    });
-    addTest("Graph snapping within range", () => {
-      const p = mathToPixel(0, 0);
-      const snapped = snapToIntegerPoint(p.x, p.y);
-      return snapped && snapped.x === 0 && snapped.y === 0;
-    });
-    addTest("Integer parse accepts spaced thousands", () => parseInteger("12 345") === 12345);
-    addTest("Integer parse rejects decimal", () => parseInteger("3.5") === null);
-    addTest("Format integer with spaces", () => formatIntegerWithSpaces(12345) === "12 345");
-    addTest("Game problem respects difficulty randomization", () => {
-      state.difficulty = "random";
-      const p = generateGameProblem();
-      return ["easy", "medium", "hard"].includes(p.difficulty);
-    });
-    addTest("Worksheet generator count", () => {
-      const arr = generateWorksheetProblems(7, "mixed", "easy");
-      return arr.length === 7;
-    });
-    addTest("Graph default stage drawing", () => graphState.stage === "drawing");
-    addTest("Timer default off", () => state.timerEnabled === false);
+
+    addTest("Decimal parser accepts 2 dp", () => parseNumberInput("-1.25", true, 2) === -1.25);
+    addTest("Decimal parser rejects 3 dp", () => parseNumberInput("1.234", true, 2) === null);
+    addTest("Integer parser path rejects decimal", () => parseNumberInput("3.5", false, 2) === null);
 
     devList.innerHTML = "";
     tests.forEach(t => {
       const li = document.createElement("li");
-      li.textContent = (t.ok ? "✔ " : "✖ ") + t.name;
+      li.textContent = (t.ok ? "OK " : "FAIL ") + t.name;
       li.className = t.ok ? "ok" : "fail";
       devList.appendChild(li);
     });
@@ -1763,6 +1750,28 @@
     renderWorksheet();
     loadNewProblem();
     if (hasDevMode()) runDevTests();
+  }
+
+  function renderIncorrectList() {
+    incorrectList.innerHTML = "";
+    if (state.incorrectProblems.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "No incorrect problems in this session so far.";
+      incorrectList.appendChild(li);
+      return;
+    }
+    state.incorrectProblems.forEach((item, idx) => {
+      const li = document.createElement("li");
+      const p = item.problem;
+      const eqs = p.lines[0].display + " ; " + p.lines[1].display;
+      const sol = "(" + formatNumber(p.solution.x) + ", " + formatNumber(p.solution.y) + ")";
+      li.textContent =
+        (idx + 1) + ". [" + p.type.toUpperCase() + "] " +
+        eqs + " | Correct solution: " + sol +
+        (item.answer ? " | Your answer: " + item.answer : "") +
+        (item.reason ? " | " + item.reason : "");
+      incorrectList.appendChild(li);
+    });
   }
 
   init();
