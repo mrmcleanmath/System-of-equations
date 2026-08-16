@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -455,6 +456,30 @@
     .dev-panel ul { margin: 4px 0 0; padding-left: 16px; }
     .dev-panel li.ok { color: var(--success); }
     .dev-panel li.fail { color: var(--error); }
+  
+    /* Refined classroom layout */
+    h1 { font-size: 2.15rem; }
+    .subtitle { font-size: 1.08rem; }
+    .chip, .tab, button { font-size: 1rem; }
+    .chip { padding: 8px 16px; }
+    .panel-title { font-size: 1.25rem; }
+    .instructions { font-size: 1.08rem; line-height: 1.45; }
+    .equations { font-size: 1.25rem; padding: 12px 14px; }
+    .equation-badge, .small-tag { font-size: 0.88rem; }
+    .field { font-size: 1rem; }
+    .field input { font-size: 1.1rem; padding: 9px 10px; }
+    .feedback-panel { font-size: 1.05rem; }
+    .feedback-main { font-size: 1.2rem; }
+    .feedback-detail { font-size: 1rem; line-height: 1.45; }
+    .score-row { font-size: 1rem; }
+    .worksheet-list { font-size: 1rem; }
+    .worksheet-answer { font-size: 0.98rem; }
+    #toggleTimer, #timerSelect, #timerTag { display: none !important; }
+    label.toggle:has(#toggleTimer) { display: none !important; }
+    #scoreValue, #streakValue, #accuracyValue { display:none; }
+    .score-pill:has(#scoreValue), .score-pill:has(#streakValue), .score-pill:has(#accuracyValue) { display:none; }
+    .summary { display:none; }
+
   </style>
 </head>
 <body>
@@ -462,7 +487,7 @@
   <header>
     <h1>Solve Systems of Linear Equations</h1>
     <p class="subtitle">
-      Practice solving systems of linear equations graphically (by drawing lines on a grid) and algebraically (by calculation).
+      Solve systems graphically or algebraically.
     </p>
   </header>
 
@@ -470,16 +495,13 @@
     <div class="panel-header">
       <div class="chip-row" aria-label="Difficulty selection">
         <button class="chip active" data-difficulty="easy" type="button">
-          <span class="emoji">🟢</span><span>Easy</span>
+          <span>Foundation</span>
         </button>
         <button class="chip" data-difficulty="medium" type="button">
-          <span class="emoji">🟡</span><span>Medium</span>
+          <span>Core</span>
         </button>
         <button class="chip" data-difficulty="hard" type="button">
-          <span class="emoji">🔴</span><span>Hard</span>
-        </button>
-        <button class="chip" data-difficulty="random" type="button">
-          <span class="emoji">🎲</span><span>Random</span>
+          <span>Challenge</span>
         </button>
       </div>
       <div class="toggle-row">
@@ -524,7 +546,7 @@
   <div id="gameView" class="layout">
     <div class="panel" aria-labelledby="problemTitle">
       <div class="panel-header">
-        <div class="panel-title" id="problemTitle">Game problem</div>
+        <div class="panel-title" id="problemTitle">Problem</div>
         <div class="pill-group">
           <span class="small-tag" id="modeTag">Mode: Graph</span>
           <span class="small-tag" id="difficultyTag">Difficulty: Easy</span>
@@ -582,7 +604,7 @@
 
     <div class="panel" aria-label="Feedback and summary">
       <div class="panel-header">
-        <div class="panel-title">Feedback & score</div>
+        <div class="panel-title">Feedback</div>
       </div>
       <div class="feedback-panel">
         <div id="feedbackMain" class="feedback-main" aria-live="polite"></div>
@@ -592,7 +614,8 @@
       <div class="score-row">
         <div class="score-pill">Score: <span id="scoreValue">0</span></div>
         <div class="score-pill">Streak: <span id="streakValue">0</span></div>
-        <div class="score-pill">Correct: <span id="correctValue">0</span> / <span id="totalValue">0</span></div>
+        <div class="score-pill">Correct: <span id="correctValue">0</span></div>
+        <div class="score-pill">Incorrect: <span id="incorrectValue">0</span></div>
         <div class="score-pill">Accuracy: <span id="accuracyValue">0%</span></div>
       </div>
 
@@ -620,6 +643,12 @@
     </div>
 
     <div class="worksheet-controls">
+      <label class="small-tag" for="wsDifficulty">Difficulty:</label>
+      <select id="wsDifficulty" class="select">
+        <option value="easy">Foundation</option>
+        <option value="medium">Core</option>
+        <option value="hard">Challenge</option>
+      </select>
       <span class="small-tag">Number of questions:</span>
       <button class="chip" data-wq="5" type="button">5</button>
       <button class="chip active" data-wq="10" type="button">10</button>
@@ -727,6 +756,7 @@
   const correctValue = document.getElementById("correctValue");
   const totalValue = document.getElementById("totalValue");
   const accuracyValue = document.getElementById("accuracyValue");
+  const incorrectValue = document.getElementById("incorrectValue");
   const toggleSummaryBtn = document.getElementById("toggleSummaryBtn");
   const summaryContent = document.getElementById("summaryContent");
   const incorrectList = document.getElementById("incorrectList");
@@ -734,6 +764,7 @@
   const devPanel = document.getElementById("devPanel");
   const devList = document.getElementById("devList");
 
+  const wsDifficulty = document.getElementById("wsDifficulty");
   const worksheetCountChips = document.querySelectorAll(".chip[data-wq]");
   const worksheetTypeChips = document.querySelectorAll(".chip[data-wtype]");
   const generateWorksheetBtn = document.getElementById("generateWorksheetBtn");
@@ -789,7 +820,7 @@
     }
     // allow decimals up to maxDp (default 2)
     const dp = (typeof maxDp === "number" ? maxDp : 2);
-    const re = new RegExp("^-?\\d+(?:\\.\\d{1," + dp + "})?$");
+    const re = new RegExp("^-?\\\d+(?:\\\.\\\d{1," + dp + "})?$");
     if (!re.test(cleaned)) return null;
     const n2 = parseFloat(cleaned);
     return Number.isNaN(n2) ? null : n2;
@@ -1128,8 +1159,7 @@
   }
 
   function generateGameProblem() {
-    let difficulty = state.difficulty;
-    if (difficulty === "random") difficulty = sample(["easy", "medium", "hard"]);
+    const difficulty = state.difficulty;
 
     const gameMode = chooseGameModeForProblem();
 
@@ -1200,8 +1230,8 @@
     if (state.gameMode !== "graph") return;
 
     const rect = graphCanvas.getBoundingClientRect();
-    const px = evt.clientX - rect.left;
-    const py = evt.clientY - rect.top;
+    const px = (evt.clientX - rect.left) * (graphCanvas.width / rect.width);
+    const py = (evt.clientY - rect.top) * (graphCanvas.height / rect.height);
     const snapped = snapToIntegerPoint(px, py);
     if (!snapped) {
       setFeedbackDetail("Click inside the grid.");
@@ -1282,6 +1312,7 @@
     streakValue.textContent = state.streak;
     correctValue.textContent = state.correct;
     totalValue.textContent = state.total;
+    if (incorrectValue) incorrectValue.textContent = state.total - state.correct;
     const acc = state.total > 0 ? Math.round((state.correct / state.total) * 100) : 0;
     accuracyValue.textContent = acc + "%";
   }
@@ -1316,11 +1347,9 @@
   function setModeTags() {
     const m = state.currentProblem ? state.currentProblem.type : state.gameMode;
     modeTag.textContent = "Mode: " + (m === "graph" ? "Graph" : "Algebra");
-    const d =
-      state.difficulty === "random"
-        ? "Random (" + (state.currentProblem ? state.currentProblem.difficulty : "") + ")"
-        : capitalize(state.difficulty);
-    difficultyTag.textContent = "Difficulty: " + d;
+    const labels = { easy: "Foundation", medium: "Core", hard: "Challenge" };
+    const actualDiff = state.currentProblem ? state.currentProblem.difficulty : state.difficulty;
+    difficultyTag.textContent = "Difficulty: " + (labels[actualDiff] || capitalize(actualDiff));
   }
 
   function capitalize(s) {
@@ -1373,7 +1402,6 @@
     clearInputs();
     resetGraphState();
     renderProblem();
-    startTimer();
   }
 
   function algebraAllowsDecimals(prob) {
@@ -1664,9 +1692,7 @@
   });
 
   generateWorksheetBtn.addEventListener("click", () => {
-    const diff = state.difficulty === "random"
-      ? sample(["easy", "medium", "hard"])
-      : state.difficulty;
+    const diff = wsDifficulty ? wsDifficulty.value : state.difficulty;
     worksheetState.problems = generateWorksheetProblems(
       worksheetState.count,
       worksheetState.type,
@@ -1744,8 +1770,7 @@
   function init() {
     body.classList.remove("high-contrast-off");
     state.soundOn = toggleSound.checked;
-    state.timerEnabled = toggleTimer.checked;
-    state.timerSeconds = parseInt(timerSelect.value, 10) || 60;
+    state.timerEnabled = false;
     renderIncorrectList();
     renderWorksheet();
     loadNewProblem();
